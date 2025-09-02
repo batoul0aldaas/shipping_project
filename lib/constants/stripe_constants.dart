@@ -1,0 +1,6 @@
+
+const String STRIPE_PUBLISHABLE_KEY =
+    "pk_test_51RKnVfGBt2itBRC5gjJmPPEnyTtjdbR0ni7AGmayhOhBHzBoLJNuGsHGwvTLFXDo7IJs4UDeiRRh5FmL6eLa8W7J00PVDQvNC2";
+const String STRIPE_MERCHANT_NAME = "My Store";
+
+const String STRIPE_DEFAULT_CURRENCY = "usd";
