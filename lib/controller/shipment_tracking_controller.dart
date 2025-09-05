@@ -37,11 +37,13 @@ class ShipmentTrackingController extends GetxController {
   void clearError() => errorMessage.value = "";
 
   Future<void> openTrackingLink(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
+    final uri = Uri.parse(url.trim());
+
+    try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      Get.snackbar("خطأ", "لا يمكن فتح رابط التتبع");
+    } catch (e) {
+      Get.snackbar("خطأ", "فشل فتح الرابط: $url");
     }
   }
+
 }

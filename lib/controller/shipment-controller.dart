@@ -44,12 +44,14 @@ class ShipmentController extends GetxController {
   final employeeNotesController = TextEditingController();
   final customerNotesController = TextEditingController();
   final List<String> serviceTypes = ['import', 'export'];
-  final List<String> shippingMethods = ['sea', 'air', 'Land'];
+  final List<String> shippingMethods = ['sea', 'air', 'land'];
   final TextEditingController fileController = TextEditingController();
   var shipments = <ShipmentModel>[].obs;
   var documents = <DocumentModel>[].obs;
    final List<TextEditingController> answersControllers = [];
   var questions = <QuestionModel>[].obs;
+  var fieldErrors = <String, String?>{}.obs;
+
 
   int? orderId;
 
@@ -63,48 +65,103 @@ class ShipmentController extends GetxController {
   }
 
   bool validateForm() {
+    fieldErrors.clear();
     bool isValid = true;
 
-    isCategoryEmpty.value = selectedCategory.value == null;
-    isServiceTypeEmpty.value = serviceType.value.isEmpty;
-    isShippingMethodEmpty.value = shippingMethod.value.isEmpty;
-    isWeightEmpty.value = weightController.text.trim().isEmpty;
-    isDateEmpty.value = shippingDateController.text.trim().isEmpty;
-    isDestinationEmpty.value = destinationController.text.trim().isEmpty;
 
-    if (isCategoryEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى اختيار الفئة");
-      isValid = false;
-    } else if (isServiceTypeEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى اختيار نوع الخدمة");
-      isValid = false;
-    } else if (isShippingMethodEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى اختيار طريقة الشحن");
-      isValid = false;
-    } else if (isWeightEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى إدخال وزن الشحنة");
-      isValid = false;
-    } else if (isDateEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى تحديد تاريخ الشحن");
-      isValid = false;
-    } else if (isDestinationEmpty.value) {
-      Get.snackbar("تنبيه", "يرجى إدخال بلد الوصول");
+    if (selectedCategory.value == null) {
+      fieldErrors['category'] = "يرجى اختيار الفئة";
       isValid = false;
     }
-    if (useSupplier.value) {
-      if (supplierNameController.text.trim().isEmpty ||
-          supplierAddressController.text.trim().isEmpty ||
-          supplierEmailController.text.trim().isEmpty ||
-          supplierPhoneController.text.trim().isEmpty ||fileController.text.trim().isEmpty) {
-        Get.snackbar("تنبيه", "يرجى ملء جميع بيانات المعمل");
+
+
+    if (serviceType.value.isEmpty) {
+      fieldErrors['serviceType'] = "يرجى اختيار نوع الخدمة";
+      isValid = false;
+    }
+
+
+    if (shippingMethod.value.isEmpty) {
+      fieldErrors['shippingMethod'] = "يرجى اختيار طريقة الشحن";
+      isValid = false;
+    }
+
+
+    if (destinationController.text.trim().isEmpty) {
+      fieldErrors['destination'] = "يرجى إدخال بلد الوصول";
+      isValid = false;
+    }
+
+
+    if (shippingDateController.text.trim().isEmpty) {
+      fieldErrors['date'] = "يرجى تحديد تاريخ الشحن";
+      isValid = false;
+    }
+
+
+    if (weightController.text.trim().isEmpty) {
+      fieldErrors['weight'] = "يرجى إدخال وزن الشحنة";
+      isValid = false;
+    } else {
+      final weight = double.tryParse(weightController.text.trim());
+      if (weight == null || weight <= 0) {
+        fieldErrors['weight'] = "الوزن يجب أن يكون رقمًا موجبًا";
         isValid = false;
-        isSupplierFormInvalid.value = true;
-      } else {
-        isSupplierFormInvalid.value = false;
       }
     }
+
+
+    if (containersNumberController.text.trim().isNotEmpty) {
+      final count = int.tryParse(containersNumberController.text.trim());
+      if (count == null || count <= 0) {
+        fieldErrors['containersNumber'] = "عدد الحاويات يجب أن يكون رقمًا موجبًا";
+        isValid = false;
+      }
+    }
+
+
+    if (containerSizeController.text.trim().isNotEmpty) {
+      final size = double.tryParse(containerSizeController.text.trim());
+      if (size == null || size <= 0) {
+        fieldErrors['containerSize'] = "حجم الحاوية يجب أن يكون رقمًا موجبًا";
+        isValid = false;
+      }
+    }
+
+
+    if (useSupplier.value) {
+      if (supplierNameController.text.trim().isEmpty) {
+        fieldErrors['supplierName'] = "يرجى إدخال اسم المعمل";
+        isValid = false;
+      }
+      if (supplierAddressController.text.trim().isEmpty) {
+        fieldErrors['supplierAddress'] = "يرجى إدخال عنوان المعمل";
+        isValid = false;
+      }
+      if (supplierEmailController.text.trim().isEmpty) {
+        fieldErrors['supplierEmail'] = "يرجى إدخال البريد الإلكتروني";
+        isValid = false;
+      } else {
+        final emailRegex =
+        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+        if (!emailRegex.hasMatch(supplierEmailController.text.trim())) {
+          fieldErrors['supplierEmail'] = "صيغة البريد الإلكتروني غير صحيحة";
+          isValid = false;
+        }
+      }
+      if (supplierPhoneController.text.trim().isEmpty) {
+        fieldErrors['supplierPhone'] = "يرجى إدخال رقم التواصل";
+        isValid = false;
+      }
+      if (fileController.text.trim().isEmpty) {
+        fieldErrors['supplierFile'] = "يرجى رفع ملف الفاتورة";
+        isValid = false;
+      }
+    }
+
     return isValid;
   }
+
 
   void pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -189,7 +246,7 @@ class ShipmentController extends GetxController {
     try {
       final id = orderIdParam ?? orderId;
       if (id == null) {
-        print("❌ orderId is null, can't fetch shipments.");
+        print(" orderId is null, can't fetch shipments.");
         return;
       }
       shipments.value = await ApiShipmentService.getShipmentsByOrderId(id);
@@ -207,9 +264,17 @@ class ShipmentController extends GetxController {
     try {
       final result = await ApiShipmentService.getFullShipmentById(shipmentId);
 
-
       if (result != null) {
         shipment = result;
+
+        useSupplier.value = false;
+        supplierNameController.clear();
+        supplierAddressController.clear();
+        supplierEmailController.clear();
+        supplierPhoneController.clear();
+        fileController.clear();
+        documents.clear();
+
         selectedCategory.value = categories.firstWhereOrNull(
               (cat) => cat.id.toString() == result.categoryId,
         );
@@ -223,8 +288,8 @@ class ShipmentController extends GetxController {
         containersNumberController.text = result.containersNumbers ?? '';
         employeeNotesController.text = result.employeeNotes ?? '';
         customerNotesController.text = result.customerNotes ?? '';
-        useSupplier.value = result.havingSupplier ?? false;
 
+        useSupplier.value = result.havingSupplier ?? false;
         if (useSupplier.value) {
           supplierNameController.text = result.supplierName ?? '';
           supplierAddressController.text = result.supplierAddress ?? '';
@@ -233,26 +298,56 @@ class ShipmentController extends GetxController {
         }
 
         documents.value = result.documents ?? [];
-
         final invoice = documents.firstWhereOrNull((doc) => doc.type == 'sup_invoice');
         if (invoice != null) {
           fileController.text = invoice.filePath?.split('/').last ?? 'تم رفع الملف';
         }
 
-      answersControllers.clear();
-      if (shipment.answers != null) {
-        for (var answer in shipment.answers!) {
-          answersControllers.add(TextEditingController(text: answer.answer));
-        }}
+        if (shipment.answers != null) {
+          for (var ans in shipment.answers!) {
+            if (ans.question.type == "checkbox") {
+              if (ans.answer is int) {
+                ans.answer = [ans.answer];
+              } else if (ans.answer is String && ans.answer.toString().isNotEmpty) {
+                ans.answer = [int.tryParse(ans.answer.toString()) ?? 0];
+              } else if (ans.answer is List) {
+                ans.answer = ans.answer.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+              } else {
+                ans.answer = [];
+              }
+            }
+          }
+
+          answersControllers.clear();
+          for (var answer in shipment.answers!) {
+            if (answer.question.type == "text") {
+              answersControllers.add(TextEditingController(text: answer.answer ?? ""));
+            } else {
+              answersControllers.add(TextEditingController());
+            }
+          }
+        }
       }
     } catch (e) {
-      print("❗ Error in controller.fetchShipmentFullData: $e");
+      print(" Error in controller.fetchShipmentFullData: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> submitEditedShipment(int shipmentId) async {
+
+    if (originController.text.trim().isEmpty) {
+      Get.snackbar(
+        "تنبيه",
+        "يرجى إدخال بلد المنشأ",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent.withOpacity(0.2),
+        colorText: Colors.red,
+      );
+      return;
+    }
+
     isLoading.value = true;
     try {
       final shipment = ShipmentModel(
@@ -275,11 +370,6 @@ class ShipmentController extends GetxController {
         answers: this.shipment.answers,
       );
 
-      if (shipment.answers != null) {
-        for (int i = 0; i < shipment.answers!.length; i++) {
-          shipment.answers![i].answer = answersControllers[i].text.trim();
-        }
-      }
       final success = await ApiShipmentService.postEditShipment(
         shipmentId: shipmentId,
         shipment: shipment,

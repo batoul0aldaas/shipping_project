@@ -9,6 +9,8 @@ import '../services/api_InvoiceOrder.dart';
 
 class InvoiceOrderView extends StatelessWidget {
   final int orderId;
+  final bool showPayButton;
+  final bool isDeliveredOrder;
   final InvoiceOrderController controller = Get.put(InvoiceOrderController());
   final PaymentInfoController paymentController = Get.put(PaymentInfoController());
 
@@ -18,15 +20,21 @@ class InvoiceOrderView extends StatelessWidget {
     decimalDigits: 2,
   );
 
-  InvoiceOrderView({required this.orderId, Key? key}) : super(key: key) {
+  InvoiceOrderView({
+    required this.orderId,
+    this.showPayButton = false,
+    this.isDeliveredOrder = false,
+    Key? key,
+  }) : super(key: key) {
     controller.loadOrderInvoice(orderId);
+    paymentController.loadPaymentInfo(orderId);
   }
 
   static const List<String> allowedCurrencies = [
     "USD", "JOD", "KWT", "SAU", "ARE", "QAT", "OMN", "EGY", "BHR"
   ];
 
-  Future<void> _chooseCurrencyAndPay(int orderId) async {
+  Future<void> _chooseCurrencyAndPay(int invoiceId, {bool isRemaining25 = false}) async {
     final selectedCurrency = await Get.bottomSheet<String>(
       Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -74,27 +82,24 @@ class InvoiceOrderView extends StatelessWidget {
     );
 
     if (selectedCurrency != null) {
-      await _startPayment(orderId, selectedCurrency);
+      await _startPayment(invoiceId, selectedCurrency, isRemaining25: isRemaining25);
     }
   }
 
-  Future<void> _startPayment(int orderId, String currency) async {
+  Future<void> _startPayment(int invoiceId, String currency, {bool isRemaining25 = false}) async {
     try {
-      final payRes = await ApiPaymentService.payInvoice(orderId, currency);
+      final payRes = await ApiPaymentService.payInvoice(invoiceId, currency);
       final data = payRes["data"] ?? {};
       final paymentLink = data["payment_link"] ?? "";
       final mfInvoiceId = data["mf_invoice_id"]?.toString() ?? "";
 
       if (paymentLink.isNotEmpty && mfInvoiceId.isNotEmpty) {
-
         final result = await Navigator.of(Get.context!).push(
-          MaterialPageRoute(
-            builder: (_) => PaymentWebView(paymentLink: paymentLink),
-          ),
+          MaterialPageRoute(builder: (_) => PaymentWebView(paymentLink: paymentLink)),
         );
 
         if (result == true) {
-          await _verifyPayment(orderId, mfInvoiceId);
+          await _verifyPayment(invoiceId, mfInvoiceId, isRemaining25: isRemaining25);
         }
       } else {
         _showError("رابط الدفع أو معرف الفاتورة غير متاح");
@@ -104,13 +109,26 @@ class InvoiceOrderView extends StatelessWidget {
     }
   }
 
-  Future<void> _verifyPayment(int orderId, String mfInvoiceId) async {
+  Future<void> _verifyPayment(int invoiceId, String mfInvoiceId, {bool isRemaining25 = false}) async {
     try {
-      final verifyRes = await ApiPaymentService.verifyPayment(orderId, mfInvoiceId);
+      final verifyRes = await ApiPaymentService.verifyPayment(invoiceId, mfInvoiceId);
 
       if (verifyRes["status"] == 1 && verifyRes["data"]["status"] == "succeeded") {
         _showSuccess("تم الدفع بنجاح ✅\n${verifyRes["message"]}");
-        controller.loadOrderInvoice(orderId);
+        controller.loadOrderInvoice(invoiceId);
+        if (isRemaining25) {
+          paymentController.paymentInfo.update((val) {
+            if (val != null) {
+              val.paidAmount += val.nextPaymentAmount;
+              val.dueAmount = 0;
+              val.nextPaymentAmount = 0;
+              val.nextPaymentPhase = "paid";
+            }
+          });
+        } else {
+          paymentController.loadPaymentInfo(invoiceId);
+        }
+
         Get.back();
       } else {
         _showError("فشل التحقق من الدفع\n${verifyRes["message"]}");
@@ -121,17 +139,14 @@ class InvoiceOrderView extends StatelessWidget {
   }
 
   void _showError(String message) {
-    Get.snackbar("خطأ", message,
-        backgroundColor: Colors.red, colorText: Colors.white);
+    Get.snackbar("خطأ", message, backgroundColor: Colors.red, colorText: Colors.white);
   }
 
   void _showSuccess(String message) {
-    Get.snackbar("نجاح", message,
-        backgroundColor: Colors.green, colorText: Colors.white);
+    Get.snackbar("نجاح", message, backgroundColor: Colors.green, colorText: Colors.white);
   }
 
-  Widget infoRow(IconData icon, String label, String value,
-      {Color? valueColor}) {
+  Widget infoRow(IconData icon, String label, String value, {Color? valueColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -141,69 +156,33 @@ class InvoiceOrderView extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black87),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: valueColor ?? Colors.black87,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: valueColor ?? Colors.black87),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPayButton(BuildContext context, double amount, int invoiceId) {
+  Widget _buildPayRemainingButton(BuildContext context, double remainingAmount, int invoiceId) {
     return GestureDetector(
-      onTap: () => _chooseCurrencyAndPay(invoiceId),
+      onTap: () => _chooseCurrencyAndPay(invoiceId, isRemaining25: true),
       child: Container(
         height: 58,
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade600, Colors.deepPurple.shade400],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.deepPurple.shade200.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          gradient: LinearGradient(colors: [Colors.deepPurple.shade600, Colors.deepPurple.shade400]),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.payment, color: Colors.white),
-            const SizedBox(width: 12),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'ادفع الآن',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  currencyFormat.format(amount),
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-              ],
-            ),
-          ],
+        child: Center(
+          child: Text(
+            'ادفع 25% المتبقي: \$${remainingAmount.toStringAsFixed(2)}',
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -214,31 +193,24 @@ class InvoiceOrderView extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade300, Colors.deepPurple.shade50],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+          gradient: LinearGradient(colors: [Colors.deepPurple.shade300, Colors.deepPurple.shade50], begin: Alignment.topCenter, end: Alignment.bottomCenter),
         ),
         child: SafeArea(
           child: Obx(() {
-            if (controller.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.deepPurple),
-              );
-            }
-            final invoice = controller.invoice.value;
-            if (invoice == null) {
-              return const Center(
-                child: Text(
-                  'لا توجد فاتورة لعرضها',
-                  style: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
-              );
+            if (controller.isLoading.value || paymentController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator(color: Colors.deepPurple));
             }
 
-            final paidStatus =
-            invoice.nextPaymentAmount == 0 ? 'مدفوعة ' : 'غير مدفوعة ';
+            final invoice = controller.invoice.value;
+            final paymentInfo = paymentController.paymentInfo.value;
+
+            if (invoice == null) {
+              return const Center(child: Text('لا توجد فاتورة لعرضها', style: TextStyle(fontSize: 18, color: Colors.black54)));
+            }
+
+            final paidStatus = invoice.paymentStatus;
+            final paidAmount = paymentInfo?.paidAmount ?? 0;
+            final remainingAmount = paymentInfo?.dueAmount ?? invoice.totalFinalAmount;
 
             return Column(
               children: [
@@ -248,26 +220,9 @@ class InvoiceOrderView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: () => Get.back(),
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 26),
-                      ),
-                      const Text(
-                        "تفاصيل الفاتورة",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          ApiInvoiceService.downloadOrderInvoice(orderId);
-                        },
-                        icon: const Icon(Icons.download,
-                            color: Colors.white, size: 26),
-                      ),
+                      IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.arrow_back, color: Colors.white, size: 26)),
+                      const Text("تفاصيل الفاتورة", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      IconButton(onPressed: () { ApiInvoiceService.downloadOrderInvoice(orderId); }, icon: const Icon(Icons.download, color: Colors.white, size: 26)),
                     ],
                   ),
                 ),
@@ -282,70 +237,30 @@ class InvoiceOrderView extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
+                            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 12, offset: const Offset(0, 6))],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
-                                "رقم الفاتورة",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                ),
-                              ),
+                              const Text("رقم الفاتورة", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87)),
                               const SizedBox(height: 6),
-                              Text(
-                                invoice.invoiceNumber.toString(),
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.deepPurple,
-                                ),
-                              ),
+                              Text(invoice.invoiceNumber.toString(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                               const SizedBox(height: 10),
-                              Text(
-                                "الحالة: $paidStatus",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: invoice.nextPaymentAmount == 0
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
-                              ),
+                              Text("الحالة: $paidStatus", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: invoice.nextPaymentAmount == 0 ? Colors.green : Colors.red)),
                               const Divider(height: 30, thickness: 1.2),
-                              infoRow(Icons.attach_money, 'المبلغ الأولي',
-                                  currencyFormat.format(invoice.totalInitialAmount)),
-                              infoRow(Icons.account_balance, 'رسوم الجمارك',
-                                  currencyFormat.format(invoice.totalCustomsFee)),
-                              infoRow(Icons.miscellaneous_services, 'رسوم الخدمة',
-                                  currencyFormat.format(invoice.totalServiceFee)),
-                              infoRow(Icons.trending_up, 'ربح الشركة',
-                                  currencyFormat.format(invoice.totalCompanyProfit)),
-                              infoRow(
-                                Icons.done_all,
-                                'المبلغ النهائي',
-                                currencyFormat.format(invoice.totalFinalAmount),
-                                valueColor: Colors.green,
-                              ),
+                              infoRow(Icons.attach_money, 'المبلغ الأولي', currencyFormat.format(invoice.totalInitialAmount)),
+                              infoRow(Icons.account_balance, 'رسوم الجمارك', currencyFormat.format(invoice.totalCustomsFee)),
+                              infoRow(Icons.miscellaneous_services, 'رسوم الخدمة', currencyFormat.format(invoice.totalServiceFee)),
+                              infoRow(Icons.trending_up, 'ربح الشركة', currencyFormat.format(invoice.totalCompanyProfit)),
+                              infoRow(Icons.done_all, 'المبلغ النهائي', currencyFormat.format(invoice.totalFinalAmount), valueColor: Colors.green),
+                              const SizedBox(height: 10),
+                              Text('المبلغ المدفوع: \$${paidAmount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              Text('المبلغ المتبقي: \$${remainingAmount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        if (invoice.nextPaymentAmount > 0)
-                          _buildPayButton(
-                            context,
-                            invoice.nextPaymentAmount,
-                            invoice.id,
-                          ),
+                        if (isDeliveredOrder || (invoice.nextPaymentAmount > 0 && paidStatus != "مدفوع"))
+                          _buildPayRemainingButton(context, invoice.nextPaymentAmount, invoice.id),
                       ],
                     ),
                   ),

@@ -11,6 +11,7 @@ class QuestionModel {
   required this.options,
   });
 
+
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
   return QuestionModel(
   id: json['id'],
@@ -28,6 +29,7 @@ class OptionModel {
   final int id;
   final String value;
 
+
   OptionModel({required this.id, required this.value});
 
   factory OptionModel.fromJson(Map<String, dynamic> json) {
@@ -36,4 +38,6 @@ class OptionModel {
       value: json['value'] ?? '',
     );
   }
+
+
 }

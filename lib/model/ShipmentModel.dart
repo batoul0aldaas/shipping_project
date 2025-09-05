@@ -94,6 +94,7 @@ class ShipmentModel {
       'customer_notes': customerNotes,
       'having_supplier': havingSupplier,
     };
+
     if (containersSize != null && containersSize!.trim().isNotEmpty) {
       data['containers_size'] = int.tryParse(containersSize!);
     }
@@ -113,8 +114,7 @@ class ShipmentModel {
 
     if (answers != null) {
       for (int i = 0; i < answers!.length; i++) {
-        data['answers[$i][id]'] = answers![i].id.toString();
-        data['answers[$i][answer]'] = answers![i].answer;
+        data.addAll(answers![i].toJson(i));
       }
     }
 

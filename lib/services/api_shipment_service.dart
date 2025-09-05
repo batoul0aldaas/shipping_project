@@ -416,7 +416,7 @@ class ApiShipmentService {
       return false;
     }}
 
-  static Future<String> confirmOrder(int orderId) async {
+ /* static Future<String> confirmOrder(int orderId) async {
     final uri = Uri.parse('${ApiService.baseUrl}/api/order/confirm/$orderId');
 
     try {
@@ -430,6 +430,6 @@ class ApiShipmentService {
       print(" Error in confirmOrder: $e");
       return 'فشل الاتصال بالخادم';
     }
+  }*/
   }
 
-}

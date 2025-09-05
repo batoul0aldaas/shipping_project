@@ -8,6 +8,7 @@ class ShipmentCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onInvoice;
   final VoidCallback? onTracing;
+  final VoidCallback? onContract;
   final bool showStatus;
 
   const ShipmentCard({
@@ -19,6 +20,7 @@ class ShipmentCard extends StatelessWidget {
     required this.onInvoice,
     required this.onTracing,
     required this.showStatus,
+    required this.onContract,
   });
 
   @override
@@ -55,7 +57,6 @@ class ShipmentCard extends StatelessWidget {
                     labelStyle: TextStyle(color: Color(0xFF667EEA), fontWeight: FontWeight.bold),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-
                 if (showStatus && shipment.status != null)
                   Chip(
                     label: Text(shipment.status!.toUpperCase()),
@@ -66,18 +67,31 @@ class ShipmentCard extends StatelessWidget {
                     ),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                if (onContract != null)
+                  ActionChip(
+                    label: const Text("العقد"),
+                    onPressed: onContract!,
+                    backgroundColor: Colors.brown.shade50,
+                    labelStyle: const TextStyle(
+                      color: Colors.brown,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
               ],
             ),
 
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined, size: 15,),
+                const Icon(Icons.calendar_today_outlined, size: 15),
                 const SizedBox(width: 6),
-                Text("Dep. ${shipment.shippingDate ?? "--"}",style:TextStyle(fontSize: 12),),
+                Text(
+                  "Dep. ${shipment.shippingDate ?? "--"}",
+                  style: TextStyle(fontSize: 12),
+                ),
               ],
             ),
-
 
             const SizedBox(height: 8),
 
@@ -85,11 +99,17 @@ class ShipmentCard extends StatelessWidget {
               children: [
                 const Icon(Icons.flight_takeoff, size: 15),
                 const SizedBox(width: 1),
-                Text("From: ${shipment.originCountry ?? '--'}",style: TextStyle(color: Colors.black54,fontSize: 12),),
+                Text(
+                  "From: ${shipment.originCountry ?? '--'}",
+                  style: TextStyle(color: Colors.black54, fontSize: 12),
+                ),
                 const SizedBox(width: 10),
                 const Icon(Icons.flight_land, size: 15),
                 const SizedBox(width: 1),
-                Text("To : ${shipment.destinationCountry ?? '--'}",style: TextStyle(fontSize: 12),),
+                Text(
+                  "To : ${shipment.destinationCountry ?? '--'}",
+                  style: TextStyle(fontSize: 12),
+                ),
               ],
             ),
 
@@ -121,13 +141,12 @@ class ShipmentCard extends StatelessWidget {
                   tooltip: "حذف الشحنة",
                 ),
                 if (onTracing != null)
-                IconButton(
-                  icon: const Icon(Icons.location_on, color: Colors.teal),
-                  onPressed: onTracing,
-                ),
+                  IconButton(
+                    icon: const Icon(Icons.location_on, color: Colors.teal),
+                    onPressed: onTracing,
+                  ),
               ],
             ),
-
           ],
         ),
       ),

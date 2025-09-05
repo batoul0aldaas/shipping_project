@@ -119,4 +119,33 @@ class ApiPaymentService {
       throw Exception(data["message"] ?? "Failed to fetch payment info");
     }
   }
+
+  static Future<Map<String, dynamic>> confirmOrder(int orderId, String currency) async {
+    final url = Uri.parse("${ApiService.baseUrl}/api/order/confirm");
+
+    print("=== CONFIRM ORDER & PAY ===");
+    print("Order ID: $orderId, Currency: $currency");
+    print("POST URL: $url");
+
+    final response = await http.post(
+      url,
+      headers: ApiService.headersWithToken(),
+      body: {
+        "order_id": orderId.toString(),
+        "currency": currency.toUpperCase(),
+      },
+    );
+
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data["status"] == 1) {
+      return data;
+    } else {
+      throw Exception(data["message"] ?? "Failed to confirm order and pay");
+    }
+  }
+
 }

@@ -24,11 +24,13 @@ class TrackingRoute {
   final int id;
   final int shipmentId;
   final String trackingLink;
+  final String trackingNumber;
 
   TrackingRoute({
     required this.id,
     required this.shipmentId,
     required this.trackingLink,
+    required this.trackingNumber,
   });
 
   factory TrackingRoute.fromJson(Map<String, dynamic> json) {
@@ -36,20 +38,29 @@ class TrackingRoute {
       id: json['id'] ?? 0,
       shipmentId: json['shipment_id'] ?? 0,
       trackingLink: json['tracking_link'] ?? '',
+      trackingNumber: json['tracking_number'] ?? '',
     );
   }
 }
 
 class TrackingLog {
-  final String? status;
-  final String? date;
+  final int id;
+  final int shipmentId;
+  final String location;
 
-  TrackingLog({this.status, this.date});
+  TrackingLog({
+    required this.id,
+    required this.shipmentId,
+    required this.location,
+  });
 
   factory TrackingLog.fromJson(Map<String, dynamic> json) {
     return TrackingLog(
-      status: json['status'],
-      date: json['date'],
+      id: json['id'] ?? 0,
+      shipmentId: json['shipment_id'] ?? 0,
+      location: json['location'] ?? 'غير معروف',
     );
   }
 }
+
+

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/shipment-controller.dart';
@@ -33,36 +32,33 @@ class ShipmentView extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF667EEA),
-                Color(0xFF764BA2),
-              ],
+              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
             ),
           ),
         ),
       ),
-      body:Obx(() {
-      if (controller.isLoading.value) {
-        return Center(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF667EEA).withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF667EEA).withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
+              ),
             ),
-            child: const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
-            ),
-          ),
-        );
-      }
+          );
+        }
 
         return Padding(
           padding: const EdgeInsets.all(16.0),
@@ -73,15 +69,19 @@ class ShipmentView extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    "assets/images/Bill-of-LP-Image-1.webp",
-                    height: 120,
+                    "assets/images/8.jpg",
+                    height: 200,
+                    width: 400,
                     fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   "new_shipment".tr,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -91,16 +91,15 @@ class ShipmentView extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 Obx(
-                      () => CustomDropdownFormField<CategoryModel>(
+                  () => CustomDropdownFormField<CategoryModel>(
                     label: "category".tr,
                     value: controller.selectedCategory.value,
                     items: controller.categories,
                     getLabel: (cat) => cat.name,
                     onChanged: (cat) => controller.selectedCategory.value = cat,
-                    isError: controller.isCategoryEmpty.value,
+                    errorText: controller.fieldErrors['category'],
                   ),
                 ),
-
                 const SizedBox(height: 16),
 
                 Obx(
@@ -110,15 +109,14 @@ class ShipmentView extends StatelessWidget {
                         ? null
                         : controller.serviceType.value,
                     items: controller.serviceTypes,
-                    getLabel: (type) => type == 'import' ? 'استيراد' : 'تصدير',
-                    onChanged: (val) =>
-                    controller.serviceType.value = val ?? '',
-                    getIcon: (type) => type == 'import'
-                        ? Icons.call_received
-                        : Icons.call_made,
-                    isError: controller.isServiceTypeEmpty.value,
+                    getLabel: (type) => type.tr,
+                    onChanged: (val) => controller.serviceType.value = val ?? '',
+                    getIcon: (type) =>
+                    type == 'import' ? Icons.call_received : Icons.call_made,
+                    errorText: controller.fieldErrors['serviceType'],
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
                 Obx(
@@ -128,21 +126,17 @@ class ShipmentView extends StatelessWidget {
                         ? null
                         : controller.shippingMethod.value,
                     items: controller.shippingMethods,
-                    getLabel: (method) => method == 'sea'
-                        ? 'بحري'
-                        : method == 'air'
-                        ? 'جوي'
-                        : 'بري',
-                    onChanged: (val) =>
-                    controller.shippingMethod.value = val ?? '',
+                    getLabel: (method) => method.tr,
+                    onChanged: (val) => controller.shippingMethod.value = val ?? '',
                     getIcon: (method) => method == 'sea'
                         ? Icons.sailing
                         : method == 'air'
                         ? Icons.flight
                         : Icons.local_shipping,
-                    isError: controller.isShippingMethodEmpty.value,
+                    errorText: controller.fieldErrors['shippingMethod'],
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
                 CustomTextField(
@@ -150,39 +144,48 @@ class ShipmentView extends StatelessWidget {
                   controller: controller.originController,
                   keyboardType: TextInputType.text,
                 ),
+
                 CustomTextField(
                   label: "destination_country".tr,
                   controller: controller.destinationController,
                   keyboardType: TextInputType.text,
-                  isError: controller.isDestinationEmpty.value,
+                  errorText: controller.fieldErrors['destination'],
                 ),
+
                 CustomDateField(
                   label: "shipping_date".tr,
                   controller: controller.shippingDateController,
-                  isError: controller.isDateEmpty.value,
+                  errorText: controller.fieldErrors['date'],
                 ),
+
                 CustomTextField(
                   label: "weight".tr,
                   controller: controller.weightController,
                   keyboardType: TextInputType.number,
-                  isError: controller.isWeightEmpty.value,
+                  errorText: controller.fieldErrors['weight'],
                 ),
+
                 CustomTextField(
                   label: "container_size".tr,
                   controller: controller.containerSizeController,
                   keyboardType: TextInputType.number,
+                  errorText: controller.fieldErrors['containerSize'],
                 ),
+
                 CustomTextField(
                   label: "containers_number".tr,
                   controller: controller.containersNumberController,
                   keyboardType: TextInputType.number,
+                  errorText: controller.fieldErrors['containersNumber'],
                 ),
+
                 CustomTextField(
                   label: "employee_notes".tr,
                   controller: controller.employeeNotesController,
                   keyboardType: TextInputType.text,
                   maxLines: 2,
                 ),
+
                 CustomTextField(
                   label: "customer_notes".tr,
                   controller: controller.customerNotesController,
@@ -205,7 +208,7 @@ class ShipmentView extends StatelessWidget {
                     ],
                   ),
                   child: Obx(
-                        () => SwitchListTile(
+                    () => SwitchListTile(
                       title: Text(
                         "use_supplier".tr,
                         style: const TextStyle(
@@ -224,15 +227,18 @@ class ShipmentView extends StatelessWidget {
                       value: controller.useSupplier.value,
                       onChanged: (val) => controller.useSupplier.value = val,
                       activeColor: const Color(0xFF667EEA),
-                      activeTrackColor: const Color(0xFF667EEA).withOpacity(0.3),
+                      activeTrackColor: const Color(
+                        0xFF667EEA,
+                      ).withOpacity(0.3),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
                 ),
 
                 Obx(() {
-                  if (!controller.useSupplier.value) return const SizedBox.shrink();
-
+                  if (!controller.useSupplier.value) {
+                    return const SizedBox.shrink();
+                  }
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(24),
@@ -286,30 +292,36 @@ class ShipmentView extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 20),
+
                         CustomTextField(
                           label: "supplier_name".tr,
                           controller: controller.supplierNameController,
                           keyboardType: TextInputType.text,
                           prefixIcon: Icons.drive_file_rename_outline,
+                          errorText: controller.fieldErrors['supplierName'],
                         ),
                         CustomTextField(
                           label: "supplier_address".tr,
                           controller: controller.supplierAddressController,
                           keyboardType: TextInputType.text,
                           prefixIcon: Icons.location_city_outlined,
+                          errorText: controller.fieldErrors['supplierAddress'],
                         ),
                         CustomTextField(
                           label: "supplier_email".tr,
                           controller: controller.supplierEmailController,
                           keyboardType: TextInputType.emailAddress,
                           prefixIcon: Icons.email_outlined,
+                          errorText: controller.fieldErrors['supplierEmail'],
                         ),
                         CustomTextField(
                           label: "supplier_phone".tr,
                           controller: controller.supplierPhoneController,
                           keyboardType: TextInputType.phone,
                           prefixIcon: Icons.phone_android_outlined,
+                          errorText: controller.fieldErrors['supplierPhone'],
                         ),
+
                         GestureDetector(
                           onTap: controller.pickFile,
                           child: AbsorbPointer(
@@ -319,14 +331,15 @@ class ShipmentView extends StatelessWidget {
                               prefixIcon: Icons.attach_file,
                               readOnly: true,
                               hintText: "pick_file".tr,
+                              errorText: controller.fieldErrors['supplierFile'],
                             ),
                           ),
                         ),
+
                       ],
                     ),
                   );
                 }),
-
                 const SizedBox(height: 32),
 
                 Container(
@@ -336,36 +349,22 @@ class ShipmentView extends StatelessWidget {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF667EEA),
-                        Color(0xFF764BA2),
-                      ],
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF667EEA).withOpacity(0.4),
+                        color: Color(0xFF667EEA).withOpacity(0.4),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  child: controller.isLoading.value
-                      ? Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: const Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
-                      : ElevatedButton(
-                    onPressed: controller.submitShipmentAndSupplier,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (controller.validateForm()) {
+                        controller.submitShipmentAndSupplier();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,

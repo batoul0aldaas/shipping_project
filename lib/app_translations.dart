@@ -3,11 +3,10 @@ import 'package:get/get.dart';
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-
     'en': {
       'title': 'Home',
       'change_language': 'Change Language',
-      'log_out':'Log Out',
+      'log_out': 'Log Out',
       'categories': 'Categories',
       'shipment_data': 'Shipment Data',
       'new_shipment': 'Send New Shipment',
@@ -40,20 +39,44 @@ class AppTranslations extends Translations {
       'send': 'Send',
       'no_shipments_in_cart': 'No shipments currently in cart',
       'add_shipments_to_get_started': 'Add shipment to get started',
-      'from':'From',
-      'to':'To',
+      'from': 'From',
+      'to': 'To',
       'please_fill_questions': "Please fill questions",
-      'these_questions_required': "These questions are required depending on classfication.",
+      'these_questions_required': "These questions are required depending on classification.",
       'submit_shipment': "Submit Shipment",
-      'save-update':'Save Update',
-      'send-shipment':'Send Shipment',
-      'cart':'Cart'
+      'save-update': 'Save Update',
+      'send-shipment': 'Send Shipment',
+      'cart': 'Cart',
+
+
+      'home': 'Home',
+      'my_orders': 'My Orders',
+      'notifications': 'Notifications',
+
+
+      'rate_experience': 'Rate your experience',
+      'help_us_improve': 'Help us improve our services',
+      'employee_rating': 'Employee Rating',
+      'service_rating': 'Service Rating',
+      'submit_rating': 'Submit Rating',
+      'thank_you': 'Thank you!',
+      'rating_success': 'Your rating has been submitted successfully',
+      'error': 'Error',
+      'rating_error': 'An error occurred while submitting the rating',
+      'warning': 'Warning',
+      'select_full_rating': 'Please select a full rating',
+
+      "import": "Import",
+      "export": "Export",
+      "sea": "Sea",
+      "air": "Air",
+      "land": "Land",
 
     },
     'ar': {
       'title': 'الرئيسية',
       'change_language': 'تغيير اللغة',
-      'log_out':'تسجيل الخروج',
+      'log_out': 'تسجيل الخروج',
       'categories': 'الفئات',
       'shipment_data': 'بيانات الشحنة',
       'new_shipment': 'إرسال شحنة جديدة',
@@ -85,16 +108,39 @@ class AppTranslations extends Translations {
       'yes_send': 'نعم، أرسل',
       'send': 'إرسال',
       'no_shipments_in_cart': 'لا توجد شحنات حالياً في الكارت',
-      'add_shipments_to_get_started':'أضف الشحنات للبدء',
-      'from':'من',
-      'to':'الى',
+      'add_shipments_to_get_started': 'أضف الشحنات للبدء',
+      'from': 'من',
+      'to': 'الى',
       'please_fill_questions': "يرجى تعبئة الأسئلة المتبقية",
       'these_questions_required': "هذه الأسئلة مطلوبة حسب نوع التصنيف",
       'submit_shipment': "إرسال الشحنة",
-      'save-update':'حفظ التعديل',
-      'send-shipment':'ارسال الشحنة',
-      'cart':'السلة'
-    }
+      'save-update': 'حفظ التعديل',
+      'send-shipment': 'ارسال الشحنة',
+      'cart': 'السلة',
 
+
+      'home': 'الرئيسية',
+      'my_orders': 'طلباتي',
+      'notifications': 'الإشعارات',
+
+
+      'rate_experience': 'قيّم تجربتك',
+      'help_us_improve': 'ساعدنا في تحسين خدماتنا',
+      'employee_rating': 'تقييم الموظف',
+      'service_rating': 'تقييم الخدمة',
+      'submit_rating': 'إرسال التقييم',
+      'thank_you': 'شكراً لك!',
+      'rating_success': 'تم إرسال تقييمك بنجاح',
+      'error': 'خطأ',
+      'rating_error': 'حدث خطأ أثناء إرسال التقييم',
+      'warning': 'تنبيه',
+      'select_full_rating': 'الرجاء اختيار تقييم كامل',
+
+      "import": "استيراد",
+      "export": "تصدير",
+      "sea": "بحري",
+      "air": "جوي",
+      "land": "بري",
+    }
   };
 }

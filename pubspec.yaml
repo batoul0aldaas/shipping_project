@@ -50,6 +50,9 @@ dependencies:
   dio: ^5.9.0
   permission_handler: ^12.0.1
   webview_flutter: ^4.13.0
+  firebase_core: ^4.1.0
+  firebase_messaging: ^16.0.1
+  flutter_local_notifications: ^19.4.1
 
 dev_dependencies:
   flutter_test:
@@ -90,9 +93,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Angkor
+    - family: Mada
       fonts:
-        - asset: assets/fonts/Angkor-Regular.ttf
+        - asset: assets/fonts/Mada-VariableFont_wght.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
     - family: Caveat

@@ -8,6 +8,7 @@ class InvoiceOrderModel {
   final double totalFinalAmount;
   final String notes;
   final double nextPaymentAmount;
+  final String paymentStatus;
 
   InvoiceOrderModel({
     required this.id,
@@ -19,6 +20,7 @@ class InvoiceOrderModel {
     required this.totalFinalAmount,
     required this.notes,
     required this.nextPaymentAmount,
+    required this.paymentStatus,
   });
 
   factory InvoiceOrderModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class InvoiceOrderModel {
       totalFinalAmount: (json['total_final_amount'] as num).toDouble(),
       notes: json['notes'] ?? '',
       nextPaymentAmount: (json['next_payment_amount'] as num?)?.toDouble() ?? 0.0,
+      paymentStatus: json['payment_status'] ?? 'غير محدد',
     );
   }
 }

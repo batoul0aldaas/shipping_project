@@ -58,7 +58,7 @@ class RatingDialog {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          label,
+                          label.tr,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -94,12 +94,14 @@ class RatingDialog {
                                     ],
                                   )
                                       : null,
-                                  color: isSelected ? null : Colors.grey.shade200,
+                                  color:
+                                  isSelected ? null : Colors.grey.shade200,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: isSelected
                                       ? [
                                     BoxShadow(
-                                      color: const Color(0xFF667EEA).withOpacity(0.4),
+                                      color: const Color(0xFF667EEA)
+                                          .withOpacity(0.4),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -108,7 +110,9 @@ class RatingDialog {
                                 ),
                                 child: Icon(
                                   Icons.star_rounded,
-                                  color: isSelected ? Colors.white : Colors.grey.shade400,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.grey.shade400,
                                   size: 24,
                                 ),
                               ),
@@ -144,7 +148,8 @@ class RatingDialog {
                     Container(
                       width: double.infinity,
                       decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                        borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(28)),
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -160,17 +165,25 @@ class RatingDialog {
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Icon(Icons.star_rate_rounded, size: 30, color: Colors.white),
+                            child: const Icon(Icons.star_rate_rounded,
+                                size: 30, color: Colors.white),
                           ),
                           const SizedBox(height: 10),
-                          const Text(
-                            "قيّم تجربتك",
-                            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.white),
+                          Text(
+                            "rate_experience".tr,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "ساعدنا في تحسين خدماتنا",
-                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                            "help_us_improve".tr,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -181,8 +194,10 @@ class RatingDialog {
                       padding: const EdgeInsets.all(24),
                       child: Column(
                         children: [
-                          buildStars(employeeRate, (v) => employeeRate = v, "تقييم الموظف", Icons.person_rounded),
-                          buildStars(serviceRate, (v) => serviceRate = v, "تقييم الخدمة", Icons.room_service_rounded),
+                          buildStars(employeeRate,
+                                  (v) => employeeRate = v, "employee_rating", Icons.person_rounded),
+                          buildStars(serviceRate,
+                                  (v) => serviceRate = v, "service_rating", Icons.room_service_rounded),
                           const SizedBox(height: 24),
 
                           Row(
@@ -192,19 +207,28 @@ class RatingDialog {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: const Color(0xFF667EEA).withOpacity(0.3),
+                                      color: const Color(0xFF667EEA)
+                                          .withOpacity(0.3),
                                       width: 1,
                                     ),
                                   ),
                                   child: TextButton(
-                                    onPressed: () => Navigator.pop(context),
+                                    onPressed: () =>
+                                        Navigator.pop(context),
                                     style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(16)),
                                     ),
-                                    child: const Text(
-                                      "إلغاء",
-                                      style: TextStyle(color: Color(0xFF667EEA), fontSize: 16, fontWeight: FontWeight.w600),
+                                    child: Text(
+                                      "cancel".tr,
+                                      style: const TextStyle(
+                                        color: Color(0xFF667EEA),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -218,11 +242,15 @@ class RatingDialog {
                                     gradient: const LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
-                                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                                      colors: [
+                                        Color(0xFF667EEA),
+                                        Color(0xFF764BA2)
+                                      ],
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF667EEA).withOpacity(0.4),
+                                        color: const Color(0xFF667EEA)
+                                            .withOpacity(0.4),
                                         blurRadius: 15,
                                         offset: Offset(0, 8),
                                       ),
@@ -230,49 +258,71 @@ class RatingDialog {
                                   ),
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      if (employeeRate > 0 && serviceRate > 0) {
+                                      if (employeeRate > 0 &&
+                                          serviceRate > 0) {
                                         // Show loader
                                         Get.dialog(
-                                          const Center(child: CircularProgressIndicator()),
+                                          const Center(
+                                              child:
+                                              CircularProgressIndicator()),
                                           barrierDismissible: false,
                                         );
 
-                                        final success = await onRate(orderId, employeeRate, serviceRate);
+                                        final success =
+                                        await onRate(orderId,
+                                            employeeRate, serviceRate);
 
                                         Get.back();
 
                                         if (success) {
                                           Get.snackbar(
-                                            "شكراً لك!",
-                                            "تم إرسال تقييمك بنجاح",
-                                            backgroundColor: const Color(0xFF10B981).withOpacity(0.1),
-                                            colorText: const Color(0xFF10B981),
-                                            icon: const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981)),
-                                            snackPosition: SnackPosition.TOP,
+                                            "thank_you".tr,
+                                            "rating_success".tr,
+                                            backgroundColor:
+                                            const Color(0xFF10B981)
+                                                .withOpacity(0.1),
+                                            colorText:
+                                            const Color(0xFF10B981),
+                                            icon: const Icon(
+                                                Icons.check_circle_rounded,
+                                                color: Color(0xFF10B981)),
+                                            snackPosition:
+                                            SnackPosition.TOP,
                                             borderRadius: 16,
                                             margin: const EdgeInsets.all(16),
                                           );
                                           Navigator.pop(context);
                                         } else {
                                           Get.snackbar(
-                                            "خطأ",
-                                            "حدث خطأ أثناء إرسال التقييم",
-                                            backgroundColor: const Color(0xFFEF4444).withOpacity(0.1),
-                                            colorText: const Color(0xFFEF4444),
-                                            icon: const Icon(Icons.error_rounded, color: Color(0xFFEF4444)),
-                                            snackPosition: SnackPosition.TOP,
+                                            "error".tr,
+                                            "rating_error".tr,
+                                            backgroundColor:
+                                            const Color(0xFFEF4444)
+                                                .withOpacity(0.1),
+                                            colorText:
+                                            const Color(0xFFEF4444),
+                                            icon: const Icon(
+                                                Icons.error_rounded,
+                                                color: Color(0xFFEF4444)),
+                                            snackPosition:
+                                            SnackPosition.TOP,
                                             borderRadius: 16,
                                             margin: const EdgeInsets.all(16),
                                           );
                                         }
                                       } else {
                                         Get.snackbar(
-                                          "تنبيه",
-                                          "الرجاء اختيار تقييم كامل",
-                                          backgroundColor: Colors.orange.withOpacity(0.1),
+                                          "warning".tr,
+                                          "select_full_rating".tr,
+                                          backgroundColor:
+                                          Colors.orange.withOpacity(0.1),
                                           colorText: Colors.orange.shade700,
-                                          icon: Icon(Icons.warning_rounded, color: Colors.orange.shade700),
-                                          snackPosition: SnackPosition.TOP,
+                                          icon: Icon(
+                                            Icons.warning_rounded,
+                                            color: Colors.orange.shade700,
+                                          ),
+                                          snackPosition:
+                                          SnackPosition.TOP,
                                           borderRadius: 16,
                                           margin: const EdgeInsets.all(16),
                                         );
@@ -281,17 +331,26 @@ class RatingDialog {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(16)),
                                     ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                                        SizedBox(width: 8),
+                                        const Icon(Icons.send_rounded,
+                                            color: Colors.white, size: 20),
+                                        const SizedBox(width: 8),
                                         Text(
-                                          "إرسال التقييم",
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                                          "submit_rating".tr,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ],
                                     ),

@@ -30,7 +30,7 @@ class OrderController extends GetxController {
     }
   }
 
-  Future<void> confirmOrderById(int orderId) async {
+ /* Future<void> confirmOrderById(int orderId) async {
     final message = await ApiShipmentService.confirmOrder(orderId);
     if (message == "Order confirmed successfully.") {
       Get.snackbar("تم", message);
@@ -38,7 +38,7 @@ class OrderController extends GetxController {
     } else {
       Get.snackbar("تنبيه", message);
     }
-  }
+  }*/
 
 
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/shipment-controller.dart';
 import '../widgets/shipment_card.dart';
+import 'contract_view.dart';
 import 'edit_shipment_view.dart';
 import 'invoice_page.dart';
 
@@ -75,6 +76,7 @@ class ShipmentForOrderView extends StatelessWidget {
                 } else {
                   Get.snackbar("خطأ", "رقم الشحنة غير متوفر");
                 }
+
               },
               onInvoice: () {
                 if (shipment.id != null) {
@@ -83,13 +85,20 @@ class ShipmentForOrderView extends StatelessWidget {
                   Get.snackbar("خطأ", "رقم الشحنة غير متوفر");
                 }
               },
+              onContract: () {
+                if (shipment.id != null) {
 
+                  Get.to(() => ContractView(shipmentId: shipment.id!));
+                } else {
+                  Get.snackbar("خطأ", "رقم الشحنة غير متوفر");
+                }
+              },
               onTracing: isOrderConfirmed ? () {
                 if (shipment.id != null) {
                   Get.to(() => ShipmentTrackingView(shipmentId: shipment.id!));
                 }
               }
-              : null,
+                  : null,
 
               showStatus: isOrderConfirmed,
             );

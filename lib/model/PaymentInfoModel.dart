@@ -1,13 +1,13 @@
 class PaymentInfo {
-  final int id;
-  final String status;
-  final String currency;
-  final double paidAmount;
-  final double dueAmount;
-  final String? paidAt;
-  final String? dueDate;
-  final String nextPaymentPhase;
-  final double nextPaymentAmount;
+  int id;
+  String status;
+  String currency;
+  double paidAmount;
+  double dueAmount;
+  String? paidAt;
+  String? dueDate;
+  String nextPaymentPhase;
+  double nextPaymentAmount;
 
   PaymentInfo({
     required this.id,

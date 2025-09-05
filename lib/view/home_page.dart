@@ -1,4 +1,5 @@
 
+import 'package:ba11/view/home_content.dart';
 import 'package:ba11/view/shipment-view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -82,7 +83,7 @@ class HomeBody extends StatelessWidget {
         ),
       ),
       drawer:CustomDrawer(),
-      body:Center(child: Text("مرحبًا بك في تطبيق الاستيراد والتصدير!")),
+      body: const HomeContent(),
     );
   }
 }

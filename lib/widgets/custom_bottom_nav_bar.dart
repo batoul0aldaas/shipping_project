@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final VoidCallback onCenterTap;
-  const CustomBottomNavBar({super.key, required this.currentIndex, required this.onTap, required this.onCenterTap});
+
+  const CustomBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+    required this.onCenterTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,26 +44,26 @@ class CustomBottomNavBar extends StatelessWidget {
                   children: [
                     _NavBarItem(
                       icon: Icons.home_rounded,
-                      label: 'الرئيسية',
+                      label: 'home'.tr,
                       selected: currentIndex == 0,
                       onTap: () => onTap(0),
                     ),
                     _NavBarItem(
                       icon: Icons.list_alt_rounded,
-                      label: 'طلباتي',
+                      label: 'my_orders'.tr,
                       selected: currentIndex == 1,
                       onTap: () => onTap(1),
                     ),
                     const SizedBox(width: 56), // Space for center button
                     _NavBarItem(
                       icon: Icons.shopping_cart_rounded,
-                      label: 'السلة',
+                      label: 'cart'.tr,
                       selected: currentIndex == 2,
                       onTap: () => onTap(2),
                     ),
                     _NavBarItem(
                       icon: Icons.notifications_rounded,
-                      label: 'الإشعارات',
+                      label: 'notifications'.tr,
                       selected: currentIndex == 3,
                       onTap: () => onTap(3),
                     ),
@@ -76,10 +83,9 @@ class CustomBottomNavBar extends StatelessWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                   colors: [
-                     Color(0xFF667EEA),
-                     Color(0xFF764BA2),],),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -106,7 +112,13 @@ class _NavBarItem extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _NavBarItem({required this.icon, required this.label, required this.selected, required this.onTap});
+
+  const _NavBarItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -126,12 +138,12 @@ class _NavBarItem extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: selected
                     ? [
-                        BoxShadow(
-                          color: const Color(0xFF667EEA).withOpacity(0.18),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
+                  BoxShadow(
+                    color: const Color(0xFF667EEA).withOpacity(0.18),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
                     : [],
               ),
               child: Icon(
